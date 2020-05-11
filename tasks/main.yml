@@ -1,0 +1,48 @@
+---
+- name: Get Java Exec Path
+  shell: which java
+  register: java_exec_path
+
+- debug: var=java_exec_path
+
+- name: Create App Directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{app_dest_dir}}/{{app_name}}"
+
+- name: Copy spring boot application jar
+  become: yes
+  copy:
+    src: "{{jar_path}}"
+    dest: "{{app_dest_dir}}/{{app_name}}/{{app_name}}.jar"
+    mode: u=rwx,g=rx,o=rx
+
+- name: Create systemd service file
+  become: yes
+  template:
+    src: app.service
+    dest: "/etc/systemd/system/{{app_name}}.service"
+    mode: u=rw,g=r,o=r
+
+- name: Copy app configuration file
+  become: yes
+  template:
+    src: app.conf
+    dest: "{{app_dest_dir}}/{{app_name}}/{{app_name}}.conf"
+    mode: u=rw,g=r,o=r
+
+- name: Enable app service
+  become: yes
+  command: "{{ item }}"
+  with_items:
+    - systemctl --system daemon-reload
+    - systemctl enable {{app_name}}.service
+
+- name: Restart app service
+  become: yes
+  service:
+    name: "{{app_name}}"
+    state: restarted

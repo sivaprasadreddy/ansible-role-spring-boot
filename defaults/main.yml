@@ -1,0 +1,12 @@
+---
+# defaults file for spring-boot-app
+
+app_name: "app"
+app_description: ""
+app_user: "app"
+app_user_group: "app"
+jar_path: ""
+config_files: []
+app_env_vars: []
+
+app_dest_dir: "/var/apps"

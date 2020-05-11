@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description={{app_description | upper}}
+After=syslog.target
+
+[Service]
+User={{app_user}}
+Group={{app_user_group}}
+EnvironmentFile={{app_dest_dir}}/{{app_name}}/{{app_name}}.conf
+ExecStart={{java_exec_path.stdout}} -jar {{app_dest_dir}}/{{app_name}}/{{app_name}}.jar
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
